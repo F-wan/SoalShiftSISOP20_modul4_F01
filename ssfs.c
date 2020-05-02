@@ -14,6 +14,121 @@
 #endif
 
 char *dirpath = "/home/kaori02/Documents";
+char keyword[] = "9(ku@AW1[Lmvgax6q`5Y2Ry?+sF!^HKQiBXCUSe&0M.b%rI'7d)o4~VfZ*{#:}ETt$3J-zpc]lnh8,GwP_ND|jO";
+int key = 10;
+
+void strip_ext(char *fname)
+{
+  char *end = fname + strlen(fname);
+
+  while (end > fname && *end != '.') end--;
+
+  if (end > fname) *end = '\0';
+}
+
+void encrypt(char *path)
+{
+  for(int i = 0; i < strlen(path); i++)
+  {
+    int j = 0;
+    while(1)
+    {
+      if(path[i] == keyword[j])
+      {
+        int temp = j + key;
+        if(temp > strlen(keyword) - 1)
+        {
+          int sisaKeAkhir = strlen(keyword) - 1 - j;
+          temp = key - sisaKeAkhir - 1;
+        }
+        path[i] = keyword[temp];
+        break;
+      }
+      j++;
+    }
+  }
+}
+
+void decrypt(char *path)
+{
+  for(int i = 0; i < strlen(path); i++)
+  {
+    int j = strlen(keyword);
+    while(1)
+    {
+      if(path[i] == keyword[j])
+      {
+        int temp = j - key;
+        if(temp < 0)
+        {
+          temp = strlen(keyword) - (key - j);
+        }
+        path[i] = keyword[temp];
+        break;
+      }
+      j--;
+    }
+  }
+}
+
+void encryptPath(char *path)
+{
+	char str[1000];
+  strcpy(str, path);
+  
+  char *extension = strrchr(str, '.');
+
+  if(!extension || extension == str) return;
+  
+  char tipe[100];
+  strcpy(tipe, extension);
+
+  strip_ext(str);
+  printf("ext funct = %s\n", str);
+  
+  char* token = strtok(str, "/");
+  sprintf(path, "%s", token);
+  
+  token = strtok(NULL, "/"); 
+  
+  while (token != NULL) 
+  { 
+    encrypt(token);
+    strcat(path, "/");
+    strcat(path, token);
+    token = strtok(NULL, "/"); 
+  }
+  strcat(path, tipe);
+}
+
+void decryptPath(char *path)
+{
+	char str[1000];
+  strcpy(str, path);
+
+  char *extension = strrchr(str, '.');
+
+  if(!extension || extension == str) return;
+  
+  char tipe[100];
+  strcpy(tipe, extension);
+
+  strip_ext(str);
+  printf("\next funct = %s\n", str);
+  
+  char* token = strtok(str, "/");
+  sprintf(path, "%s", token);
+  
+  token = strtok(NULL, "/"); 
+  while (token != NULL) 
+  { 
+    decrypt(token);
+    strcat(path, "/");
+    strcat(path, token);
+    token = strtok(NULL, "/"); 
+  }
+  strcat(path, tipe);
+}
 
 void logWrite(int l, char *cmd, char *desc)
 {
